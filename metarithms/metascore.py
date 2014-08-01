@@ -4,6 +4,7 @@
 # Copyright: Bregman Labs, Dartmouth College, All Rights Reserved
 
 import numpy as np
+import matplotlib as mp
 import sys
 
 # intervals
@@ -166,3 +167,119 @@ def interleave(l,r):
     """
     return np.array([r[0],l[0],r[1],l[1],l[2]])
 
+def nchoose2(N):
+    """
+    generate combinations of 2 values from a set of n values
+    """
+    L = list()
+    for j in range(N-1):
+        for k in range(j+1,N):
+            L.append((j,k))
+    return L
+
+def nchoose3(N):
+    """
+    generate combinations of 3 values from a set of n values
+    """
+    L = list()
+    for j in range(N-2):
+        for k in range(j+1,N):
+            for l in range(k+1,N):
+                L.append((j,k,l))
+    return L
+
+
+def nkrec(N,K,L):
+    """
+    n choose k via recursion
+    """
+    if N==K:
+        return L
+    for k in range(K,N):
+        nkrec(N,K+1,L[-1].extend([k]))
+    return L
+                
+def nchoosek(N,K):
+    """
+    return list of combinations of N items taken K at a time
+    """
+    L = list()
+    if K==N:
+        return L
+    for k in range(N-K):
+        L.append([k])
+        nkrec(N,K+1,L)
+    return L
+
+# Routines to visualize and inspect complex sequences
+
+"""
+plot_abs - inspect the absolute values (magnitudes) of a sequence
+"""
+def plot_abs(x):    
+    r = abs(x)
+    mp.pyplot.stem(np.arange(len(r)),r)
+    mp.pyplot.grid()
+    mp.pyplot.title('Magnitudes')
+    mp.pyplot.xlabel('Discrete time index')
+    mp.pyplot.ylabel('Magnitude')
+    
+"""
+relative_phase - return rhythmic phase in readable form (normalized 0..1)
+"""
+def relative_phase(x):
+    p = np.angle(x)/(2*np.pi) # get relative phase (0..1)
+    p[p<0]=1.0+p[p<0]
+    return p
+
+"""
+plot_angle - inspect the phase angles of a sequence
+"""
+def plot_angle(x):
+    r = relative_phase(x)
+    mp.pyplot.stem(np.arange(len(r)),r)
+    mp.pyplot.xticks(np.arange(len(r)),r)
+    mp.pyplot.grid()
+    mp.pyplot.title('Phase Angles')
+    mp.pyplot.xlabel('Discrete time index')
+    mp.pyplot.ylabel('Relative phase (radians)')
+    
+"""
+plot_seq - inspect the magnitudes and phase angles of a sequence
+"""
+def plot_seq(x, log_freq=True):    
+    r = np.log2(np.absolute(x))*12.0 if log_freq else np.absolute(x)
+    p = relative_phase(x)
+    p[p<0]=1.0+p[p<0]
+    mp.pyplot.stem(p,r)
+    mp.pyplot.grid()
+    mp.pyplot.title('Complex Sequence')
+    mp.pyplot.xlabel('Relative phase (/2*pi)')
+    if log_freq:
+        mp.pyplot.ylabel('Half steps (relative pitch)')
+    else:
+        mp.pyplot.ylabel('Frequency ratio (relative pitch)')
+
+
+# Routines to represent sequences of frequency ratios and rhythmic phases as complex numbers
+"""
+seq_to_complex, convert between sequence and complex representations
+"""
+seq_to_complex = lambda r, p: r*np.exp(1j*2*np.pi*p)
+
+"""
+complex_to_seq, convert between complex and sequence representations
+"""
+complex_to_seq = lambda x: (np.absolute(x), relative_phase(x))
+
+# Manipulate phase to transform rhythmic information
+
+"""
+phase_offset - add a constant time offset to sequence, offset given as proportion of time duration
+"""
+phase_offset = lambda x, p : x*np.exp(1j*2*np.pi*p) # set rhythmic offset
+
+"""
+phase_scale - scale sequence temporal durations, scale given as proportion of time duration
+"""
+phase_scale = lambda x, s: np.absolute(x)*np.exp(1j*(s*np.angle(x))) # set rhythmic scaling
