@@ -4,8 +4,6 @@
 # Copyright: Bregman Labs, Dartmouth College, All Rights Reserved
 
 import numpy as np
-import matplotlib as mp
-import sys
 
 # intervals
 pU=0
@@ -76,68 +74,6 @@ abs_chord = {
 }
 
 triad = np.array([0,2,4])
-
-header="""\\version "2.12.3"
-\\header{
-    title="%s"
-}
-\score{
-\\new PianoStaff <<
-      \\new Staff = "up" {
-      \\clef treble
-      \\time 15/16
-      \\set beatGrouping = #'(5 5 5)
-      """
-
-tailer="""  }
-      \\new Staff = "down" {
-        \\time 15/16
-        \\clef treble
-        \\set beatGrouping = #'(5 5 5)
-        s1*%d
-      }
-    >>
-}"""
-
-DEFAULT_TEMPLATE = """    
-    \change Staff = "up"
-    %s16
-    \change Staff = "down"
-    %s
-    \change Staff = "up"
-    %s
-    %s
-    \change Staff = "down"
-    %s
-    """
-
-EXPERIMENTAL_TEMPLATE = """    
-    %s16
-    %s
-    %s
-    %s
-    %s
-    """
-
-def make_pitch_map():
-    pm=('c','cis','d','ees','e','f','fis','g','gis','a','bes','b')    
-    pitch_map=[]
-    for octave in range(0,4):
-        po = [p+","*(4-octave) for p in pm]
-        pitch_map.append(po)
-    pitch_map.append(pm)    
-    for octave in range(6,12):
-        po = [p+"'"*(octave-5) for p in pm]
-        pitch_map.append(po)        
-    return np.array(pitch_map).flatten()
-
-def foo(p, template=DEFAULT_TEMPLATE):
-    pm = make_pitch_map()
-    s=""
-    for ip in p:
-        t=tuple([pm[i] for i in ip])
-        s+=template%t+'\n'
-    return s
 
 def min(a):
     return np.array([a, a+3, a+7])
@@ -211,75 +147,3 @@ def nchoosek(N,K):
         nkrec(N,K+1,L)
     return L
 
-# Routines to visualize and inspect complex sequences
-
-"""
-plot_abs - inspect the absolute values (magnitudes) of a sequence
-"""
-def plot_abs(x):    
-    r = abs(x)
-    mp.pyplot.stem(np.arange(len(r)),r)
-    mp.pyplot.grid()
-    mp.pyplot.title('Magnitudes')
-    mp.pyplot.xlabel('Discrete time index')
-    mp.pyplot.ylabel('Magnitude')
-    
-"""
-relative_phase - return rhythmic phase in readable form (normalized 0..1)
-"""
-def relative_phase(x):
-    p = np.angle(x)/(2*np.pi) # get relative phase (0..1)
-    p[p<0]=1.0+p[p<0]
-    return p
-
-"""
-plot_angle - inspect the phase angles of a sequence
-"""
-def plot_angle(x):
-    r = relative_phase(x)
-    mp.pyplot.stem(np.arange(len(r)),r)
-    mp.pyplot.xticks(np.arange(len(r)),r)
-    mp.pyplot.grid()
-    mp.pyplot.title('Phase Angles')
-    mp.pyplot.xlabel('Discrete time index')
-    mp.pyplot.ylabel('Relative phase (radians)')
-    
-"""
-plot_seq - inspect the magnitudes and phase angles of a sequence
-"""
-def plot_seq(x, log_freq=True):    
-    r = np.log2(np.absolute(x))*12.0 if log_freq else np.absolute(x)
-    p = relative_phase(x)
-    p[p<0]=1.0+p[p<0]
-    mp.pyplot.stem(p,r)
-    mp.pyplot.grid()
-    mp.pyplot.title('Complex Sequence')
-    mp.pyplot.xlabel('Relative phase (/2*pi)')
-    if log_freq:
-        mp.pyplot.ylabel('Half steps (relative pitch)')
-    else:
-        mp.pyplot.ylabel('Frequency ratio (relative pitch)')
-
-
-# Routines to represent sequences of frequency ratios and rhythmic phases as complex numbers
-"""
-seq_to_complex, convert between sequence and complex representations
-"""
-seq_to_complex = lambda r, p: r*np.exp(1j*2*np.pi*p)
-
-"""
-complex_to_seq, convert between complex and sequence representations
-"""
-complex_to_seq = lambda x: (np.absolute(x), relative_phase(x))
-
-# Manipulate phase to transform rhythmic information
-
-"""
-phase_offset - add a constant time offset to sequence, offset given as proportion of time duration
-"""
-phase_offset = lambda x, p : x*np.exp(1j*2*np.pi*p) # set rhythmic offset
-
-"""
-phase_scale - scale sequence temporal durations, scale given as proportion of time duration
-"""
-phase_scale = lambda x, s: np.absolute(x)*np.exp(1j*(s*np.angle(x))) # set rhythmic scaling

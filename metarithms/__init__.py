@@ -6,13 +6,15 @@ __copyright__ = "Copyright (C) 2014  Michael Casey, Bregman Labs, Dartmouth Coll
 __license__ = "Apache v. 2.0 or higher"
 __email__ = 'mcasey@dartmouth.edu'
 
-__all__ = ["metascore","metautils"]
+__all__ = ["metascore","metautils","complexnote"]
 
 # import the bregman modules
 import metascore
 import metautils
+import complexnote
 from metascore import *
 from metautils import *
+from complexnote import *
 
 
 
