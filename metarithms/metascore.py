@@ -40,15 +40,15 @@ rel_scale = {
 'oct2':np.array([PU,M2,m2,M2,m2,M2,m2,M2,m2])
 }
 
-abs_scale = {
-'maj':np.cumsum(rel_scale['maj']),
-'mel_up':np.cumsum(rel_scale['mel_up']),
-'mel_dn':np.cumsum(rel_scale['mel_dn']),
-'har':np.cumsum(rel_scale['har']),
-'pen':np.cumsum(rel_scale['pen']),
-'who':np.cumsum(rel_scale['who']),
-'oct':np.cumsum(rel_scale['oct']),
-'oct2':np.cumsum(rel_scale['oct2'])
+relative_scale = {
+'major':np.array([PU,M2,M2,m2,M2,M2,M2,m2]),
+'melodic_ascending':np.array([PU,M2,m2,M2,M2,M2,M2,m2]),
+'melodic_descending':np.array([PU,M2,m2,M2,M2,m2,M2,M2]),
+'harmonic':np.array([PU,M2,m2,M2,M2,m2,A2,m2]),
+'pentatonic':np.array([PU,M2,A2,M2,M2,A2]),
+'wholetone':np.array([PU,M2,M2,M2,M2,M2,M2]),
+'octatonic':np.array([PU,m2,M2,m2,M2,m2,M2,m2,M2]),
+'octatonic2':np.array([PU,M2,m2,M2,m2,M2,m2,M2,m2])
 }
 
 rel_chord = {
@@ -62,16 +62,9 @@ rel_chord = {
 'minmaj7':np.array([PU,m3,M3,M3])
 }
 
-abs_chord = {
-'maj':np.cumsum(rel_chord['maj']),
-'min':np.cumsum(rel_chord['min']),
-'aug':np.cumsum(rel_chord['aug']),
-'dim':np.cumsum(rel_chord['dim']),
-'dom7':np.cumsum(rel_chord['dom7']),
-'maj7':np.cumsum(rel_chord['maj7']),
-'min7':np.cumsum(rel_chord['min7']),
-'minmaj7':np.cumsum(rel_chord['minmaj7'])
-}
+abs_scale = dict([(k,np.cumsum(rel_scale[k])) for k in rel_scale])
+absolute_scale = dict([(k,np.cumsum(relative_scale[k])) for k in relative_scale])
+abs_chord = dict([(k,np.cumsum(rel_chord[k])) for k in rel_chord])
 
 triad = np.array([0,2,4])
 
