@@ -103,7 +103,8 @@ def lookup(scale='maj', contour=[0,1,2,3,4], transposition=0):
     _scale = np.array(_scale) if type(_scale)!=np.ndarray else _scale
     l = len(_scale)-1
     _contour = np.array(contour) if type(contour)!=np.ndarray else contour
-    height = (_contour/l)*12 # octave offsets
+    _contour += transposition
+    height = (_contour//l)*_scale[-1] # octave offsets
     return _scale[np.mod(_contour,l)]+height
 
 def interleave(l,r):
