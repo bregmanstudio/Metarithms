@@ -95,8 +95,9 @@ def lookup(scale, chord):
     """
     scale = abs_scale[scale] if type(scale) is str else scale
     l = len(scale)-1
-    height = (chord/l)*12 # octave offsets
-    return scale[np.mod(chord,l)]+height
+    _chord = np.array(chord) if type(chord)!=np.ndarray else chord
+    height = (_chord/l)*12 # octave offsets
+    return scale[np.mod(_chord,l)]+height
 
 def interleave(l,r):
     """ combine separate streams into a single stream
