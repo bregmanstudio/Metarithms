@@ -83,22 +83,22 @@ def dim(a):
 def interval(a, i):
     return np.array([a, a+i])
 
-def lookup(scale='maj', contour=[0,1,2,3,4], transposition=0):
-    """ use lookup table to generate pitches from scale and contour
+def lookup(scale='maj', pattern=[0,1,2,3,4], shift=0):
+    """ use lookup table to generate pitches from a scale and a pattern
     inputs:
        scale - string or ordered list of scale intervals
-       contour - list of indexes to lookup scale
-       [transposition] - apply transposition in semitones to contour
+       pattern - list of indexes to lookup scale
+       [shift] - apply scale degree shift to pattern
     outputs:
        interval list as np.array 
     """
     _scale = abs_scale[scale] if type(scale) is str else scale
     _scale = np.array(_scale) if type(_scale)!=np.ndarray else _scale
     l = len(_scale)-1
-    _contour = np.array(contour) if type(contour)!=np.ndarray else contour
-    _contour += transposition
-    height = (_contour//l)*_scale[-1] # octave offsets
-    return _scale[np.mod(_contour,l)]+height
+    _pattern = np.array(pattern) if type(pattern)!=np.ndarray else pattern
+    _pattern += shift
+    height = (_pattern//l)*_scale[-1] # octave offsets
+    return _scale[np.mod(_pattern,l)]+height
 
 def interleave(l,r):
     """ combine separate streams into a single stream
