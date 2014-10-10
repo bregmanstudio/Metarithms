@@ -4,6 +4,7 @@
 # Copyright: Bregman Labs, Dartmouth College, All Rights Reserved
 
 import numpy as np
+import itertools
 
 # intervals
 pU=0
@@ -101,51 +102,33 @@ def lookup(scale='maj', pattern=[0,1,2,3,4], shift=0):
     return _scale[np.mod(_pattern,l)]+height
 
 def interleave(l,r):
-    """ combine separate streams into a single stream
+    """ Deprecated: combine separate streams into a single stream
     """
     return np.array([r[0],l[0],r[1],l[1],l[2]])
 
-def nchoose2(N):
+def nchoosek(N,K, with_replacement=False):
     """
-    generate combinations of 2 values from a set of n values
+    return list of all combinations of N items taken K at a time
     """
-    L = list()
-    for j in range(N-1):
-        for k in range(j+1,N):
-            L.append((j,k))
-    return L
+    if with_replacement:
+        return itertools.combinations_with_replacement(range(N),K)
+    else:
+        return itertools.combinations(range(N),K)
 
-def nchoose3(N):
+def lfsr(seed, mask):
     """
-    generate combinations of 3 values from a set of n values
+    Use lfsr tables for maximum length sequences, e.g.:
+    lfsr(0b11001001, 0b11100001) # (8,7,6,1))
     """
-    L = list()
-    for j in range(N-2):
-        for k in range(j+1,N):
-            for l in range(k+1,N):
-                L.append((j,k,l))
-    return L
+    result = seed
+    nbits = mask.bit_length()-1
+    while True:
+        result = (result << 1)
+        xor = result >> nbits
+        if xor != 0:
+            result ^= mask
+        yield xor, result
 
-
-def nkrec(N,K,L):
-    """
-    n choose k via recursion
-    """
-    if N==K:
-        return L
-    for k in range(K,N):
-        nkrec(N,K+1,L[-1].extend([k]))
-    return L
-                
-def nchoosek(N,K):
-    """
-    return list of combinations of N items taken K at a time
-    """
-    L = list()
-    if K==N:
-        return L
-    for k in range(N-K):
-        L.append([k])
-        nkrec(N,K+1,L)
-    return L
-
+def mls(N=100, gen=lfsr(0b11001001, 0b11100001)):
+    return [gen.next()[1] for _ in range(N)]
+    
